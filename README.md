@@ -1,14 +1,62 @@
 # theterminal
 
-A Bloomberg Terminal–style market workstation.
+A Bloomberg-Terminal-class market workstation with a modern, refined design —
+command-line-first navigation, multi-panel workspace, streaming quotes,
+charts, news, and an MCP server so agents can use it too.
 
-## Status
+![status](https://img.shields.io/badge/phase-1-d4b476) ![functions](https://img.shields.io/badge/functions-23_live_·_93_registered-0a0d13)
 
-**Phase 0 — Specification.** The complete feature inventory of the Bloomberg
-Terminal (every function family, mnemonic, UI nuance, and interaction pattern)
-has been extracted and documented as the build spec:
+## Quick start
 
-➡️ **[docs/BLOOMBERG_TERMINAL_FEATURES.md](docs/BLOOMBERG_TERMINAL_FEATURES.md)**
+```bash
+npm install
+npm run dev        # → http://localhost:5173
+```
 
-The spec ends with a suggested build order (§21), starting with the command-line
-shell, panel system, and `<GO>` interaction model that define the Terminal.
+With internet access the top bar shows **● LIVE DATA** (Yahoo Finance
+connector). Without it, a deterministic simulated market keeps every screen
+streaming — same UI, same ticks.
+
+## How to drive it
+
+Everything is the command line. Click a panel, type, hit ⏎:
+
+| Type | Get |
+|---|---|
+| `AAPL` | load Apple → its function menu |
+| `AAPL GP` | candlestick chart |
+| `NVDA DES` | security description |
+| `EURUSD Curncy GIP` | intraday FX chart |
+| `WEI` | world equity indices dashboard |
+| `GLCO` `WCR` `FXC` `CRYP` `WB` | commodities · currencies · FX matrix · crypto · rates |
+| `TOP` / `CN` | market news / company news |
+| `EQS` `MOST` `ECO` | screener · movers · economic calendar |
+| `W` `NOTE` `LAST` | watchlist · notepad · command history |
+| `HELP` | the full function directory |
+| `3` | select item 3 on any numbered menu |
+
+The loaded security sticks to the panel — `TSLA DES` then `GP` charts Tesla.
+`Ctrl+1..4` switches panels; the `1 / 2 / 4` buttons change the layout.
+
+## MCP server
+
+Expose the terminal's data connectors to any MCP-capable agent:
+
+```bash
+claude mcp add theterminal -- node mcp/server.mjs
+```
+
+Tools: `get_quote`, `get_history`, `search_symbols`, `get_news`.
+
+## Docs
+
+- **[docs/BLOOMBERG_TERMINAL_FEATURES.md](docs/BLOOMBERG_TERMINAL_FEATURES.md)** —
+  the complete Bloomberg Terminal feature inventory (the build spec).
+- **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)** — layers, command grammar,
+  how to add functions/connectors, phase roadmap.
+
+## Design
+
+Not Bloomberg-amber-depressing: deep ink surfaces, warm ivory type,
+champagne-gold accents, soft emerald/coral for up/down, tabular numerals,
+tick-flash animations. Dense, quiet, classy.
