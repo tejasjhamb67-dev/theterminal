@@ -118,10 +118,36 @@ watchlists), and inbound MCP so agents can drive panels.
 |---|---|---|
 | 0 | Feature inventory / spec | ✅ |
 | 1 | Shell, command engine, data layer, 23 live functions, MCP server | ✅ |
-| 2 | Equity analytics: FA, EE, ANR, DVD, EQRV comps, COMP charts | next |
-| 3 | Fixed income & rates: YAS calculator, GC curves, WIRP | |
-| 4 | Derivatives: OMON chains, OVME pricer (Black-Scholes), SKEW | |
-| 5 | Portfolio: PORT, PRTU, position upload, ALRT alerts engine | |
-| 6 | News expansion: NSE search, NI topic codes, NLRT alerts | |
-| 7 | Launchpad-style linked components, GRAB, themes (PDFS) | |
-| 8+ | Function-count grind toward the full inventory | |
+| 2 | Equity analytics: FA, EE/ERN, ANR, DVD, EQRV comps | ✅ |
+| 3 | Fixed income & rates: YAS calculator, GC curves, WIRP | ✅ |
+| 4 | Derivatives: OMON chains, OVME pricer (Black–Scholes), SKEW | ✅ |
+| 5 | Portfolio & alerts: PORT risk (beta/vol/VaR), PRTU, ALRT engine | ✅ |
+| 6 | Intelligence: IQ security read, BRIEF market narrative, NSE + sentiment | ✅ |
+| 7 | Quant charting: COMP, CORR, TECH signal dashboard | ✅ |
+| 8 | Launchpad-style linked components, GRAB, themes (PDFS) | next |
+| 9 | Fundamentals/economics connectors to replace modeled data | |
+| 10+ | Function-count grind toward the full inventory | |
+
+### The intelligence layer (phase 6)
+
+Three kinds of "intelligence", all computed client-side and deterministic:
+
+- **Quant math** (`src/core/ta.ts`, `bond.ts`, `options.ts`): SMA/EMA/RSI/MACD/
+  Bollinger, correlation, beta, VaR, drawdown; semiannual bond pricing with
+  duration/convexity/DV01; Black–Scholes with greeks, implied vol, smile
+  generation, expiry calendars.
+- **Sentiment** (`src/core/sentiment.ts`): lexicon-scored headlines — every
+  news row carries a ▲/▼/• tag; aggregates power the tape read in TOP/CN and
+  the IQ/BRIEF narratives.
+- **Narrative generation** (`IQ`, `BRIEF`): plain-language market/security
+  reads assembled from live data — trend, momentum, vol regime, range
+  position, cross-asset tone. Swappable later for an LLM connector; the data
+  assembly layer is already separated from the prose templates.
+
+### Modeled-data boundary
+
+Screens that need data with no free connector yet (fundamentals, analyst
+coverage, policy-path probabilities) run on the deterministic modeled engine
+(`src/data/fundamentals.ts`) and are labeled on-screen
+(`MODELED … connector pending`). The UI contract is identical, so wiring a
+real connector swaps the source without touching screens.

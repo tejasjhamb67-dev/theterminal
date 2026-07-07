@@ -5,6 +5,12 @@ import { CrypFn, EqsFn, FxcFn, GlcoFn, MostFn, WbFn, WcrFn, WeiFn } from './mark
 import { CnFn, TopFn } from './news';
 import { EcoFn } from './eco';
 import { NoteFn, WatchFn } from './personal';
+import { AnrFn, DvdFn, EeFn, EqrvFn, FaFn } from './equity';
+import { CompFn, CorrFn, TechFn } from './charting2';
+import { GcFn, WirpFn, YasFn } from './fi';
+import { OmonFn, OvmeFn, SkewFn } from './derivs';
+import { AlrtFn, PortFn, PrtuFn } from './portfolio';
+import { BriefFn, IqFn, NseFn } from './intel';
 import { buildStubDefs } from './stubs';
 
 export function registerAll(): void {
@@ -40,6 +46,38 @@ export function registerAll(): void {
   // ── Personal ─────────────────────────────────────────────────
   registerFn({ mnemonic: 'W', name: 'Watchlist', category: 'Portfolio', description: 'Personal streaming monitor, persisted locally.', aliases: ['MON', 'WL'], component: WatchFn });
   registerFn({ mnemonic: 'NOTE', name: 'Notepad', category: 'System', description: 'Personal scratchpad, autosaved locally.', component: NoteFn });
+
+  // ── Equity analytics ─────────────────────────────────────────
+  registerFn({ mnemonic: 'FA', name: 'Financial Analysis', category: 'Equities', description: 'Income statement, balance sheet, margins and ratios by fiscal year.', requiresSecurity: true, component: FaFn });
+  registerFn({ mnemonic: 'EE', name: 'Earnings & Estimates', category: 'Equities', description: 'Next report, consensus estimates and 8-quarter beat/miss history.', requiresSecurity: true, aliases: ['ERN', 'EM'], component: EeFn });
+  registerFn({ mnemonic: 'ANR', name: 'Analyst Recommendations', category: 'Equities', description: 'Consensus stance, price targets and firm-by-firm coverage.', requiresSecurity: true, component: AnrFn });
+  registerFn({ mnemonic: 'DVD', name: 'Dividends', category: 'Equities', description: 'Indicated yield, payout and distribution history.', requiresSecurity: true, component: DvdFn });
+  registerFn({ mnemonic: 'EQRV', name: 'Relative Valuation', category: 'Equities', description: 'Multiples comps versus sector peers, with premium/discount read.', requiresSecurity: true, aliases: ['RV'], component: EqrvFn });
+
+  // ── Advanced charting & quant ────────────────────────────────
+  registerFn({ mnemonic: 'COMP', name: 'Comparative Returns', category: 'Charting', description: 'Indexed total-return overlay vs peers and benchmark. COMP <tickers> to customize.', component: CompFn });
+  registerFn({ mnemonic: 'CORR', name: 'Correlation Matrix', category: 'Charting', description: '1Y daily-return correlation grid. CORR <tickers> to customize.', component: CorrFn });
+  registerFn({ mnemonic: 'TECH', name: 'Technical Studies', category: 'Charting', description: 'SMA/RSI/MACD/Bollinger dashboard with a plain-language signal summary.', requiresSecurity: true, component: TechFn });
+
+  // ── Fixed income ─────────────────────────────────────────────
+  registerFn({ mnemonic: 'YAS', name: 'Yield & Spread Analysis', category: 'Fixed Income', description: 'Treasury calculator: price↔yield, duration, DV01, convexity, rate scenarios.', component: YasFn });
+  registerFn({ mnemonic: 'GC', name: 'Treasury Curve', category: 'Fixed Income', description: 'Live constant-maturity curve with 2s10s/5s30s spreads and shape read.', aliases: ['CRVF'], component: GcFn });
+  registerFn({ mnemonic: 'WIRP', name: 'Implied Policy Path', category: 'Fixed Income', description: 'Meeting-by-meeting cut/hold/hike probabilities and implied rate path.', component: WirpFn });
+
+  // ── Derivatives ──────────────────────────────────────────────
+  registerFn({ mnemonic: 'OMON', name: 'Option Monitor', category: 'Derivatives', description: 'Option chain with Black–Scholes theoreticals, greeks and smile IVs on live spot.', requiresSecurity: true, component: OmonFn });
+  registerFn({ mnemonic: 'OVME', name: 'Option Valuation', category: 'Derivatives', description: 'Interactive Black–Scholes pricer: greeks, breakeven and spot ladder.', requiresSecurity: true, aliases: ['OV'], component: OvmeFn });
+  registerFn({ mnemonic: 'SKEW', name: 'Volatility Smile', category: 'Derivatives', description: 'Implied-vol smile by expiry, anchored to realized vol.', requiresSecurity: true, component: SkewFn });
+
+  // ── Portfolio & risk ─────────────────────────────────────────
+  registerFn({ mnemonic: 'PORT', name: 'Portfolio & Risk', category: 'Portfolio', description: 'Positions, P&L, weights, beta, volatility, VaR and allocation.', component: PortFn });
+  registerFn({ mnemonic: 'PRTU', name: 'Portfolio Setup', category: 'Portfolio', description: 'Add, average-in and remove positions; persisted locally.', component: PrtuFn });
+  registerFn({ mnemonic: 'ALRT', name: 'Price Alerts', category: 'Portfolio', description: 'Arm above/below price alerts checked against the streaming tape.', component: AlrtFn });
+
+  // ── Intelligence ─────────────────────────────────────────────
+  registerFn({ mnemonic: 'IQ', name: 'Security Intelligence', category: 'Markets', description: 'Plain-language quantitative read: trend, momentum, vol regime, sentiment.', requiresSecurity: true, component: IqFn });
+  registerFn({ mnemonic: 'BRIEF', name: 'Market Brief', category: 'News', description: 'Auto-generated cross-asset narrative from the live tape.', aliases: ['MB'], component: BriefFn });
+  registerFn({ mnemonic: 'NSE', name: 'News Search', category: 'News', description: 'Full-text news search with per-headline sentiment tags.', component: NseFn });
 
   // ── Roadmap stubs from the feature inventory ─────────────────
   for (const def of buildStubDefs()) registerFn(def);

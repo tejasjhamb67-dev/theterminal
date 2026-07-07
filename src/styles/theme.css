@@ -222,8 +222,8 @@ table.grid td {
 }
 table.grid tr.rowlink { cursor: pointer; }
 table.grid tr.rowlink:hover td { background: var(--bg-hover); }
-td.name-cell { color: var(--text-dim); max-width: 220px; overflow: hidden; text-overflow: ellipsis; text-align: left; }
-td.ticker-cell { color: var(--accent); text-align: left; }
+table.grid td.name-cell { color: var(--text-dim); max-width: 220px; overflow: hidden; text-overflow: ellipsis; text-align: left; }
+table.grid td.ticker-cell { color: var(--accent); text-align: left; }
 
 .up { color: var(--up); }
 .down { color: var(--down); }

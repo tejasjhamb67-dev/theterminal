@@ -4,7 +4,7 @@ A Bloomberg-Terminal-class market workstation with a modern, refined design —
 command-line-first navigation, multi-panel workspace, streaming quotes,
 charts, news, and an MCP server so agents can use it too.
 
-![status](https://img.shields.io/badge/phase-1-d4b476) ![functions](https://img.shields.io/badge/functions-23_live_·_93_registered-0a0d13)
+![status](https://img.shields.io/badge/phase-7-d4b476) ![functions](https://img.shields.io/badge/functions-43_live_·_94_registered-0a0d13)
 
 ## Quick start
 
@@ -31,6 +31,13 @@ Everything is the command line. Click a panel, type, hit ⏎:
 | `GLCO` `WCR` `FXC` `CRYP` `WB` | commodities · currencies · FX matrix · crypto · rates |
 | `TOP` / `CN` | market news / company news |
 | `EQS` `MOST` `ECO` | screener · movers · economic calendar |
+| `BRIEF` / `NVDA IQ` | auto-generated market brief · plain-language security read |
+| `AAPL FA` `EE` `ANR` `DVD` `EQRV` | financials · earnings · analyst recs · dividends · peer comps |
+| `TSLA TECH` / `COMP` / `CORR` | technical signals · relative returns · correlation matrix |
+| `YAS` `GC` `WIRP` | bond calculator · treasury curve · policy path |
+| `AAPL OMON` `OVME` `SKEW` | option chain · Black–Scholes pricer · vol smile |
+| `PORT` `PRTU` `ALRT` | portfolio risk (beta/vol/VaR) · positions · price alerts |
+| `NSE fed` | news search with sentiment tags |
 | `W` `NOTE` `LAST` | watchlist · notepad · command history |
 | `HELP` | the full function directory |
 | `3` | select item 3 on any numbered menu |

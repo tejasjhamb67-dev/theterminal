@@ -19,16 +19,20 @@ export function MenuList({
   panel,
   panelIdx: _p,
   startAt = 1,
+  register = true,
 }: {
   items: MenuItem[];
   panel: PanelApi;
   panelIdx?: number;
   startAt?: number;
+  /** Set false when the screen registers a combined menu itself. */
+  register?: boolean;
 }) {
   useEffect(() => {
+    if (!register) return;
     panel.setMenu(items);
     return () => panel.setMenu([]);
-  }, [items, panel]);
+  }, [items, panel, register]);
   return (
     <div className="menu-list">
       {items.map((it, i) => (

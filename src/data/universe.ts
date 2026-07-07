@@ -94,6 +94,7 @@ export const UNIVERSE: Security[] = [
 
   // ── Rates ──────────────────────────────────────────────────────
   S('USGG2YR Index', 'US Treasury 2Y Yield', '^IRX', 'rate', { country: 'US', simBase: 3.85, simVol: 0.18 }),
+  S('USGG5YR Index', 'US Treasury 5Y Yield', '^FVX', 'rate', { country: 'US', simBase: 3.95, simVol: 0.16 }),
   S('USGG10YR Index', 'US Treasury 10Y Yield', '^TNX', 'rate', { country: 'US', simBase: 4.35, simVol: 0.15 }),
   S('USGG30YR Index', 'US Treasury 30Y Yield', '^TYX', 'rate', { country: 'US', simBase: 4.85, simVol: 0.13 }),
 

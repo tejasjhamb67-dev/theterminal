@@ -3,6 +3,8 @@ import { useTerminal } from '../core/context';
 import { useDataMode } from '../data/hooks';
 import { allFns, liveFnCount } from '../core/registry';
 import { Panel } from './Panel';
+import { onAlertToast, startAlertLoop, type PriceAlert } from '../core/alerts';
+import { fmtPx } from '../core/fmt';
 
 function Clock() {
   const [now, setNow] = useState(new Date());
@@ -16,6 +18,40 @@ function Clock() {
     <span className="clock">
       {utc} UTC <span className="faint">· {local} LOCAL</span>
     </span>
+  );
+}
+
+function AlertToasts() {
+  const [toasts, setToasts] = useState<PriceAlert[]>([]);
+  useEffect(() => {
+    startAlertLoop();
+    return onAlertToast((a) => {
+      setToasts((ts) => [...ts, a]);
+      setTimeout(() => setToasts((ts) => ts.filter((t) => t.id !== a.id)), 9000);
+    });
+  }, []);
+  if (!toasts.length) return null;
+  return (
+    <div style={{ position: 'fixed', right: 14, bottom: 40, zIndex: 200, display: 'flex', flexDirection: 'column', gap: 8 }}>
+      {toasts.map((t) => (
+        <div
+          key={t.id}
+          style={{
+            background: 'var(--bg-raised)',
+            border: '1px solid var(--accent-dim)',
+            borderRadius: 6,
+            padding: '10px 14px',
+            boxShadow: '0 12px 32px rgba(0,0,0,0.6)',
+            minWidth: 260,
+          }}
+        >
+          <div className="gold" style={{ fontSize: 10, letterSpacing: '0.16em', marginBottom: 3 }}>⚑ PRICE ALERT</div>
+          <div style={{ fontSize: 12.5 }}>
+            {t.secId} traded {t.op} {fmtPx(t.level)} — last {fmtPx(t.triggeredPx)}
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -62,6 +98,7 @@ export function Shell() {
           <Panel key={i} idx={i} />
         ))}
       </div>
+      <AlertToasts />
       <div className="statusbar">
         <span className="sb-item">
           PANEL <b>{active + 1}</b>

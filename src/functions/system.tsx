@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { FnProps, MenuItem } from '../core/types';
 import { MenuList, QuoteHead, ScreenTitle } from '../components/widgets';
 import { allFns, getFn, searchFns } from '../core/registry';
@@ -7,18 +7,31 @@ import { UNIVERSE, searchSecurities } from '../data/universe';
 
 /** MAIN — home menu. */
 export function MainFn({ panel }: FnProps) {
-  const items: MenuItem[] = [
+  const markets: MenuItem[] = [
+    { label: 'BRIEF', cmd: 'BRIEF', detail: 'Auto-generated market brief from the live tape' },
     { label: 'WEI', cmd: 'WEI', detail: 'World equity indices — global market dashboard' },
-    { label: 'TOP', cmd: 'TOP', detail: 'Top news headlines' },
+    { label: 'TOP', cmd: 'TOP', detail: 'Top news headlines with sentiment tape' },
     { label: 'MOST', cmd: 'MOST', detail: 'Biggest movers in the coverage universe' },
     { label: 'GLCO', cmd: 'GLCO', detail: 'Global commodities dashboard' },
     { label: 'WCR', cmd: 'WCR', detail: 'World currencies vs the dollar' },
     { label: 'FXC', cmd: 'FXC', detail: 'FX cross-rate matrix' },
     { label: 'CRYP', cmd: 'CRYP', detail: 'Cryptocurrency market board' },
-    { label: 'WB', cmd: 'WB', detail: 'World bond markets — treasury yields' },
+    { label: 'WB', cmd: 'WB', detail: 'Rates & bond markets' },
     { label: 'ECO', cmd: 'ECO', detail: 'Economic release calendar' },
+  ];
+  const analytics: MenuItem[] = [
     { label: 'EQS', cmd: 'EQS', detail: 'Equity screener' },
+    { label: 'COMP', cmd: 'COMP', detail: 'Comparative total-return chart' },
+    { label: 'CORR', cmd: 'CORR', detail: 'Cross-asset correlation matrix' },
+    { label: 'YAS', cmd: 'YAS', detail: 'Treasury yield & risk calculator' },
+    { label: 'GC', cmd: 'GC', detail: 'Live treasury curve, 2s10s' },
+    { label: 'WIRP', cmd: 'WIRP', detail: 'Implied central-bank policy path' },
+  ];
+  const personal: MenuItem[] = [
+    { label: 'PORT', cmd: 'PORT', detail: 'Portfolio P&L, beta, vol and VaR' },
     { label: 'W', cmd: 'W', detail: 'Personal watchlist monitor' },
+    { label: 'ALRT', cmd: 'ALRT', detail: 'Price alerts on the streaming tape' },
+    { label: 'NSE', cmd: 'NSE', detail: 'News search with sentiment' },
     { label: 'HELP', cmd: 'HELP', detail: 'Function directory & documentation' },
   ];
   return (
@@ -28,10 +41,37 @@ export function MainFn({ panel }: FnProps) {
         Load a security by typing its ticker (<span className="gold">AAPL</span>,{' '}
         <span className="gold">EURUSD Curncy</span>, <span className="gold">GC1 Comdty</span>) or chain it
         with a function: <span className="gold">TSLA GP</span> charts Tesla,{' '}
-        <span className="gold">NVDA DES</span> describes NVIDIA. The loaded security sticks to the panel.
+        <span className="gold">NVDA IQ</span> reads NVIDIA. The loaded security sticks to the panel.
       </div>
-      <div className="menu-section">Market overview</div>
-      <MenuList items={items} panel={panel} />
+      <MainMenuSections markets={markets} analytics={analytics} personal={personal} panel={panel} />
+    </>
+  );
+}
+
+function MainMenuSections({
+  markets,
+  analytics,
+  personal,
+  panel,
+}: {
+  markets: MenuItem[];
+  analytics: MenuItem[];
+  personal: MenuItem[];
+  panel: FnProps['panel'];
+}) {
+  const all = useMemo(() => [...markets, ...analytics, ...personal], [markets, analytics, personal]);
+  useEffect(() => {
+    panel.setMenu(all);
+    return () => panel.setMenu([]);
+  }, [all, panel]);
+  return (
+    <>
+      <div className="menu-section">Markets & news</div>
+      <MenuList items={markets} panel={panel} register={false} />
+      <div className="menu-section">Analytics</div>
+      <MenuList items={analytics} panel={panel} startAt={markets.length + 1} register={false} />
+      <div className="menu-section">Personal</div>
+      <MenuList items={personal} panel={panel} startAt={markets.length + analytics.length + 1} register={false} />
     </>
   );
 }
@@ -94,14 +134,30 @@ export function HelpFn({ panel, arg }: FnProps) {
 /** SMEN — security menu (shown when a bare security is loaded). */
 export function SecMenuFn({ sec, panel }: FnProps) {
   if (!sec) return <div className="empty-hint">Load a security first — e.g. AAPL ⏎</div>;
+  const isStock = sec.kind === 'stock';
   const items: MenuItem[] = [
     { label: 'DES', cmd: 'DES', detail: 'Security description & key statistics' },
+    { label: 'IQ', cmd: 'IQ', detail: 'Intelligence: trend, momentum, vol regime, sentiment' },
     { label: 'GP', cmd: 'GP', detail: 'Price chart — candles, ranges, volume' },
     { label: 'GIP', cmd: 'GIP', detail: 'Intraday chart' },
+    { label: 'TECH', cmd: 'TECH', detail: 'Technical studies & signal summary' },
+    { label: 'COMP', cmd: 'COMP', detail: 'Total return vs peers and benchmark' },
     { label: 'HP', cmd: 'HP', detail: 'Historical price table' },
     { label: 'BQ', cmd: 'BQ', detail: 'Quote board & session detail' },
     { label: 'CN', cmd: 'CN', detail: 'News on this security' },
-    { label: 'RV', cmd: 'MOST', detail: 'Movers in the wider universe' },
+    ...(isStock
+      ? [
+          { label: 'FA', cmd: 'FA', detail: 'Financial statements & ratios' },
+          { label: 'EE', cmd: 'EE', detail: 'Earnings, estimates, beat/miss history' },
+          { label: 'ANR', cmd: 'ANR', detail: 'Analyst recommendations & targets' },
+          { label: 'EQRV', cmd: 'EQRV', detail: 'Valuation vs sector peers' },
+          { label: 'DVD', cmd: 'DVD', detail: 'Dividend profile' },
+        ]
+      : []),
+    { label: 'OMON', cmd: 'OMON', detail: 'Option chain (modeled)' },
+    { label: 'OVME', cmd: 'OVME', detail: 'Option pricer with greeks' },
+    { label: 'SKEW', cmd: 'SKEW', detail: 'Volatility smile' },
+    { label: 'ALRT', cmd: 'ALRT', detail: 'Arm a price alert' },
   ];
   return (
     <>
