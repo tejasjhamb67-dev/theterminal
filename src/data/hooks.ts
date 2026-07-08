@@ -42,7 +42,7 @@ export function useQuote(sec: Security | null): Quote | null {
     }
     let dead = false;
     const tick = () => getQuote(sec).then((v) => !dead && setQ(v)).catch(() => {});
-    const stop = pollWhileVisible(tick, mode === 'live' ? 12_000 : 2_500);
+    const stop = pollWhileVisible(tick, mode === 'live' ? 6_000 : 2_500);
     return () => {
       dead = true;
       stop();
@@ -66,7 +66,7 @@ export function useQuotes(secs: Security[]): Map<string, Quote> {
           setMap(new Map(qs.map((q) => [q.secId, q])));
         })
         .catch(() => {});
-    const stop = pollWhileVisible(tick, mode === 'live' ? 15_000 : 2_500);
+    const stop = pollWhileVisible(tick, mode === 'live' ? 8_000 : 2_500);
     return () => {
       dead = true;
       stop();

@@ -2,7 +2,9 @@ import { createContext, useCallback, useContext, useMemo, useRef, useState } fro
 import type { ReactNode } from 'react';
 import type { MenuItem, Security } from './types';
 import { resolveCommand } from './parser';
+import { getFn } from './registry';
 import { getSecurity } from '../data/universe';
+import { resolveMarketSecurity } from '../data/dynamic';
 
 export interface Frame {
   fn: string; // mnemonic
@@ -105,8 +107,28 @@ export function TerminalProvider({ children }: { children: ReactNode }) {
           frame = { fn: 'SMEN', secId: r.sec.id };
         }
         if (!frame) {
+          // Unknown locally — resolve against the whole market asynchronously.
+          const tokens = trimmed.split(/\s+/);
+          const lastFn = tokens.length > 1 ? getFn(tokens[tokens.length - 1]) : undefined;
+          const secText = lastFn ? tokens.slice(0, -1).join(' ') : trimmed;
+          resolveMarketSecurity(secText)
+            .then((sec) => {
+              if (sec) {
+                setPanels((ps2) =>
+                  ps2.map((pp, i) => {
+                    if (i !== panelIdx) return pp;
+                    const frames = pp.frames.slice(0, pp.pos + 1);
+                    frames.push({ fn: lastFn ? lastFn.mnemonic : 'SMEN', secId: sec.id });
+                    return { frames, pos: frames.length - 1, error: null };
+                  }),
+                );
+              } else {
+                setError(panelIdx, `${trimmed.toUpperCase()} — no match in the market. Try HELP <GO>.`);
+              }
+            })
+            .catch(() => setError(panelIdx, `${trimmed.toUpperCase()} — market search failed. Try again.`));
           return ps.map((pp, i) =>
-            i === panelIdx ? { ...pp, error: `${trimmed.toUpperCase()} — not a valid command. Try HELP <GO>.` } : pp,
+            i === panelIdx ? { ...pp, error: `Searching the market for ${secText.toUpperCase()}…` } : pp,
           );
         }
         return ps.map((pp, i) => {

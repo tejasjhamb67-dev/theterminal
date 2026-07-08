@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { searchFns } from '../core/registry';
 import { searchSecurities } from '../data/universe';
+import { registerDynamic, searchMarket } from '../data/dynamic';
+import { getDataMode } from '../data/service';
 import type { FunctionDef, Security } from '../core/types';
 
 interface Suggestion {
@@ -8,6 +10,7 @@ interface Suggestion {
   name: string;
   tag: string;
   insert: string;
+  sec?: Security;
 }
 
 function buildSuggestions(text: string): Suggestion[] {
@@ -25,6 +28,40 @@ function buildSuggestions(text: string): Suggestion[] {
   return out.slice(0, 9);
 }
 
+/** Debounced whole-market suggestions from the live search connector. */
+function useMarketSuggestions(text: string, enabled: boolean): Suggestion[] {
+  const [hits, setHits] = useState<Suggestion[]>([]);
+  useEffect(() => {
+    const t = text.trim();
+    if (!enabled || t.length < 2 || /^\d+$/.test(t) || getDataMode() !== 'live') {
+      setHits([]);
+      return;
+    }
+    let dead = false;
+    const timer = setTimeout(() => {
+      searchMarket(t, 5)
+        .then((secs) => {
+          if (dead) return;
+          setHits(
+            secs.map((s) => ({
+              key: s.id,
+              name: s.name,
+              tag: `${s.kind.toUpperCase()} · MARKET`,
+              insert: s.id,
+              sec: s,
+            })),
+          );
+        })
+        .catch(() => !dead && setHits([]));
+    }, 280);
+    return () => {
+      dead = true;
+      clearTimeout(timer);
+    };
+  }, [text, enabled]);
+  return hits;
+}
+
 export function CommandLine({
   onSubmit,
   onFocus,
@@ -40,14 +77,20 @@ export function CommandLine({
   const [sel, setSel] = useState(-1);
   const [open, setOpen] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
-  const suggestions = useMemo(() => (open ? buildSuggestions(text) : []), [text, open]);
+  const local = useMemo(() => (open ? buildSuggestions(text) : []), [text, open]);
+  const market = useMarketSuggestions(text, open && local.length < 6);
+  const suggestions = useMemo(() => {
+    const seen = new Set(local.map((s) => s.key.toUpperCase()));
+    return [...local, ...market.filter((m) => !seen.has(m.key.toUpperCase()))].slice(0, 10);
+  }, [local, market]);
 
   useEffect(() => {
     if (focused) inputRef.current?.focus();
   }, [focused]);
 
-  const submit = (cmd: string) => {
+  const submit = (cmd: string, sec?: Security) => {
     if (!cmd.trim()) return;
+    if (sec) registerDynamic(sec); // market pick → resolvable immediately
     onSubmit(cmd);
     setText('');
     setOpen(false);
@@ -57,7 +100,7 @@ export function CommandLine({
   const onKey = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (sel >= 0 && suggestions[sel]) submit(suggestions[sel].insert);
+      if (sel >= 0 && suggestions[sel]) submit(suggestions[sel].insert, suggestions[sel].sec);
       else submit(text);
     } else if (e.key === 'ArrowDown') {
       e.preventDefault();
@@ -106,7 +149,7 @@ export function CommandLine({
               className={'suggest-row' + (i === sel ? ' sel' : '')}
               onMouseDown={(e) => {
                 e.preventDefault();
-                submit(s.insert);
+                submit(s.insert, s.sec);
               }}
               onMouseEnter={() => setSel(i)}
             >

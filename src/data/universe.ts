@@ -134,6 +134,9 @@ export const UNIVERSE: Security[] = [
   S('XDG Crypto', 'Dogecoin / USD', 'DOGE-USD', 'crypto', { simBase: 0.165, simVol: 1.0 }),
 ];
 
+import { EXTRA_UNIVERSE } from './universeExtra';
+UNIVERSE.push(...EXTRA_UNIVERSE);
+
 const byId = new Map(UNIVERSE.map((s) => [s.id.toUpperCase(), s]));
 const byTicker = new Map<string, Security>();
 for (const s of UNIVERSE) {
@@ -141,8 +144,20 @@ for (const s of UNIVERSE) {
   if (!byTicker.has(key)) byTicker.set(key, s);
 }
 
+/** Extra lookup layers (e.g. the dynamic whole-market registry) hook in here. */
+const externalResolvers: Array<(id: string) => Security | undefined> = [];
+export function addExternalResolver(fn: (id: string) => Security | undefined): void {
+  externalResolvers.push(fn);
+}
+
 export function getSecurity(id: string): Security | undefined {
-  return byId.get(id.toUpperCase());
+  const hit = byId.get(id.toUpperCase());
+  if (hit) return hit;
+  for (const r of externalResolvers) {
+    const s = r(id);
+    if (s) return s;
+  }
+  return undefined;
 }
 
 export function getByTicker(ticker: string): Security | undefined {

@@ -5,6 +5,9 @@ import { allFns, liveFnCount } from '../core/registry';
 import { Panel } from './Panel';
 import { onAlertToast, startAlertLoop, type PriceAlert } from '../core/alerts';
 import { fmtPx } from '../core/fmt';
+import { UNIVERSE } from '../data/universe';
+import { fieldCount } from '../data/fields';
+import { NI_CODES } from '../functions/news';
 
 function Clock() {
   const [now, setNow] = useState(new Date());
@@ -104,9 +107,13 @@ export function Shell() {
           PANEL <b>{active + 1}</b>
         </span>
         <span className="sb-item">
-          FUNCTIONS <b>{liveFnCount()}</b> LIVE · <b>{allFns().length}</b> REGISTERED · TARGET <b>44,000</b>
+          FNS <b>{liveFnCount()}</b> LIVE · <b>{allFns().length}</b> REGISTERED
         </span>
-        <span className="sb-item faint">TYPE HELP ⏎ FOR THE DIRECTORY · CTRL+1..4 SWITCHES PANELS</span>
+        <span className="sb-item">
+          ELEMENTS <b>{(allFns().length + UNIVERSE.length + fieldCount() + Object.keys(NI_CODES).length).toLocaleString()}</b> · TARGET <b>44,000</b>
+        </span>
+        <span className="sb-item">COVERAGE <b>WHOLE MARKET</b> VIA LIVE SEARCH</span>
+        <span className="sb-item faint">HELP ⏎ FOR THE DIRECTORY</span>
         <div className="sb-right">
           <span className="sb-item">
             DATA <b>{mode.toUpperCase()}</b>

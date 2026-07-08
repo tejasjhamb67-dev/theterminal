@@ -1,6 +1,7 @@
 import type { FnCategory, FnProps, FunctionDef } from '../core/types';
 import { ScreenTitle } from '../components/widgets';
-import { allFns } from '../core/registry';
+import { allFns, getFn } from '../core/registry';
+import { CATALOG } from './catalog';
 
 /** Placeholder screen for spec'd-but-unbuilt functions. */
 function StubScreen({ def }: { def: FunctionDef }) {
@@ -86,7 +87,6 @@ export const STUB_SPECS: StubSpec[] = [
   ['NLRT', 'News Alerts', 'News', 'Keyword and ticker alerting to pop-up and mobile.'],
   ['READ', 'Most Read', 'News', 'Trending stories across all users.'],
   ['FIRS', 'First Word', 'News', 'Fast, trader-oriented headline squawk.'],
-  ['NI', 'Topic News', 'News', 'News by taxonomy code — NI TECH, NI FED, NI M&A…'],
   // Portfolio
   ['LQA', 'Liquidity Assessment', 'Portfolio', 'Liquidation cost and time per position.'],
   // Communication
@@ -105,16 +105,20 @@ export const STUB_SPECS: StubSpec[] = [
 ];
 
 export function buildStubDefs(): FunctionDef[] {
-  return STUB_SPECS.map(([mnemonic, name, category, description]) => {
-    const def: FunctionDef = {
-      mnemonic,
-      name,
-      category,
-      description,
-      stub: true,
-      component: () => null,
-    };
+  const combined: Array<{ mnemonic: string; name: string; category: FnCategory; description: string }> = [
+    ...STUB_SPECS.map(([mnemonic, name, category, description]) => ({ mnemonic, name, category, description })),
+    ...CATALOG,
+  ];
+  const out: FunctionDef[] = [];
+  const seen = new Set<string>();
+  for (const e of combined) {
+    const key = e.mnemonic.toUpperCase();
+    // Never shadow a live function or alias; dedupe within the catalog.
+    if (seen.has(key) || getFn(key)) continue;
+    seen.add(key);
+    const def: FunctionDef = { ...e, stub: true, component: () => null };
     def.component = StubScreen({ def });
-    return def;
-  });
+    out.push(def);
+  }
+  return out;
 }

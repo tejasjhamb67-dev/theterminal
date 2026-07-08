@@ -2,7 +2,8 @@ import { registerFn } from '../core/registry';
 import { HelpFn, LastFn, MainFn, SecMenuFn, SecfFn } from './system';
 import { BqFn, DesFn, GipFn, GpFn, HpFn } from './security';
 import { CrypFn, EqsFn, FxcFn, GlcoFn, MostFn, WbFn, WcrFn, WeiFn } from './markets';
-import { CnFn, TopFn } from './news';
+import { CnFn, NiFn, TopFn } from './news';
+import { BdpFn, FldsFn } from './fields';
 import { EcoFn } from './eco';
 import { NoteFn, WatchFn } from './personal';
 import { AnrFn, DvdFn, EeFn, EqrvFn, FaFn } from './equity';
@@ -40,8 +41,13 @@ export function registerAll(): void {
   registerFn({ mnemonic: 'EQS', name: 'Equity Screener', category: 'Equities', description: 'Filter the equity universe by sector, direction and price; sortable columns.', component: EqsFn });
 
   // ── News & economics ─────────────────────────────────────────
-  registerFn({ mnemonic: 'TOP', name: 'Top News', category: 'News', description: 'Global market headlines, newest first.', aliases: ['N', 'NH'], component: TopFn });
+  registerFn({ mnemonic: 'TOP', name: 'Top News', category: 'News', description: 'Global market headlines, newest first.', aliases: ['N'], component: TopFn });
+  registerFn({ mnemonic: 'NI', name: 'Topic News', category: 'News', description: 'News by taxonomy code — NI FED, NI TECH, NI CRYPTO… NI alone lists all codes.', component: NiFn });
   registerFn({ mnemonic: 'ECO', name: 'Economic Calendar', category: 'Economics', description: 'This week’s economic releases with survey, prior and actuals.', component: EcoFn });
+
+  // ── Data & formulas ──────────────────────────────────────────
+  registerFn({ mnemonic: 'FLDS', name: 'Field Dictionary', category: 'System', description: 'Every pull-formula field with live values for the loaded security.', requiresSecurity: true, component: FldsFn });
+  registerFn({ mnemonic: 'BDP', name: 'Data Point Pull', category: 'System', description: 'Pull one field for any security: BDP <ticker> <field>.', component: BdpFn });
 
   // ── Personal ─────────────────────────────────────────────────
   registerFn({ mnemonic: 'W', name: 'Watchlist', category: 'Portfolio', description: 'Personal streaming monitor, persisted locally.', aliases: ['MON', 'WL'], component: WatchFn });

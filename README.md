@@ -4,15 +4,17 @@ A Bloomberg-Terminal-class market workstation with a modern, refined design —
 command-line-first navigation, multi-panel workspace, streaming quotes,
 charts, news, and an MCP server so agents can use it too.
 
-![status](https://img.shields.io/badge/phase-7-d4b476) ![functions](https://img.shields.io/badge/functions-43_live_·_94_registered-0a0d13)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Ftejasjhamb67-dev%2Ftheterminal)
+
+![functions](https://img.shields.io/badge/functions-46_live_·_257_registered-d4b476) ![coverage](https://img.shields.io/badge/coverage-whole_market_via_live_search-0a0d13)
 
 ## Try it
 
 - **Hosted demo (simulated market):** https://tejasjhamb67-dev.github.io/theterminal/ — auto-deployed
   from this branch by GitHub Actions.
-- **Vercel (LIVE data):** import this repo at [vercel.com/new](https://vercel.com/new) or run
-  `npx vercel` — `vercel.json` + `api/yf.js` proxy the Yahoo Finance connector server-side, so a
-  Vercel deployment runs in **● LIVE DATA** mode.
+- **Vercel (LIVE data) — recommended:** click the Deploy button above, or run `npx vercel` in a
+  clone — `vercel.json` + `api/yf.js` proxy the market connector server-side, so a Vercel
+  deployment runs in **● LIVE DATA** mode with whole-market symbol search.
 - Static hosts (Pages, artifacts) have no `/yf` proxy, so they run on the built-in simulated
   market — same UI, deterministic streaming ticks.
 
@@ -47,7 +49,9 @@ Everything is the command line. Click a panel, type, hit ⏎:
 | `YAS` `GC` `WIRP` | bond calculator · treasury curve · policy path |
 | `AAPL OMON` `OVME` `SKEW` | option chain · Black–Scholes pricer · vol smile |
 | `PORT` `PRTU` `ALRT` | portfolio risk (beta/vol/VaR) · positions · price alerts |
-| `NSE fed` | news search with sentiment tags |
+| `NSE fed` / `NI FED` | news search · topic-coded news (25 codes) |
+| `AAPL FLDS` / `BDP TSLA RSI_14D` | live field dictionary · single-field formula pulls |
+| `TATAMOTORS DES` | whole-market coverage — any listed symbol on any exchange resolves |
 | `W` `NOTE` `LAST` | watchlist · notepad · command history |
 | `HELP` | the full function directory |
 | `3` | select item 3 on any numbered menu |
