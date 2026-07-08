@@ -6,6 +6,7 @@ import { getBars } from '../data/service';
 import { annualizedVol, beta, closes, historicalVaR, logReturns } from '../core/ta';
 import { fmtBig, fmtPct, fmtPx, upDown, fmtDateTime } from '../core/fmt';
 import { getSecurity } from '../data/universe';
+import { storageGet, storageSet } from '../core/storage';
 import { resolveSecurity } from '../core/parser';
 import { addAlert, getAlerts, onAlertsChange, rearmAlert, removeAlert } from '../core/alerts';
 
@@ -19,7 +20,7 @@ export interface Position {
 
 function loadPositions(): Position[] {
   try {
-    const raw = localStorage.getItem(POS_KEY);
+    const raw = storageGet(POS_KEY);
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
   return [
@@ -32,7 +33,7 @@ function loadPositions(): Position[] {
 }
 
 function savePositions(ps: Position[]) {
-  localStorage.setItem(POS_KEY, JSON.stringify(ps));
+  storageSet(POS_KEY, JSON.stringify(ps));
 }
 
 function usePositions(): [Position[], (ps: Position[]) => void] {

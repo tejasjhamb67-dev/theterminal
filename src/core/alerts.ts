@@ -1,6 +1,7 @@
 import type { Quote, Security } from './types';
 import { getSecurity } from '../data/universe';
 import { getQuote } from '../data/service';
+import { storageGet, storageSet } from './storage';
 
 /** Price-alert engine: localStorage persistence, background polling, toasts. */
 
@@ -24,14 +25,14 @@ const toastListeners = new Set<(a: PriceAlert) => void>();
 
 function load(): PriceAlert[] {
   try {
-    const raw = localStorage.getItem(KEY);
+    const raw = storageGet(KEY);
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
   return [];
 }
 
 function save() {
-  localStorage.setItem(KEY, JSON.stringify(alerts));
+  storageSet(KEY, JSON.stringify(alerts));
   listeners.forEach((cb) => cb());
 }
 

@@ -1,12 +1,20 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import { viteSingleFile } from 'vite-plugin-singlefile';
 
+// SINGLE_FILE=1 npm run build → one self-contained index.html (used for the
+// hosted Artifact build; everything inlined, runs on the simulated market).
+//
 // Dev-server proxies for external data connectors (browsers can't hit these
-// hosts directly due to CORS). Each connector in src/data/providers targets
-// one of these paths. In production, terminate these routes at your own
-// gateway (see docs/ARCHITECTURE.md → Data Connectors).
+// hosts directly due to CORS). In production the same /yf route is served by
+// api/yf.js on Vercel (see vercel.json) — static hosts fall back to SIM mode.
 export default defineConfig({
-  plugins: [react()],
+  base: './',
+  plugins: [react(), ...(process.env.SINGLE_FILE ? [viteSingleFile()] : [])],
+  build: {
+    target: 'es2020',
+    chunkSizeWarningLimit: 900,
+  },
   server: {
     proxy: {
       '/yf': {

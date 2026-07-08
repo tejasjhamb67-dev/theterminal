@@ -2,6 +2,29 @@ import { useEffect, useRef, useState } from 'react';
 import type { Bar, ChartRange, DataMode, NewsItem, Quote, Security } from './hookTypes';
 import { getBars, getDataMode, getNews, getQuote, getQuotes, onDataMode } from './service';
 
+/**
+ * Visibility-aware polling: pauses the interval while the tab is hidden and
+ * fires immediately on return, so a backgrounded terminal costs ~nothing.
+ */
+function pollWhileVisible(tick: () => void, ms: number): () => void {
+  let iv: ReturnType<typeof setInterval> | undefined;
+  const start = () => {
+    tick();
+    iv = setInterval(() => {
+      if (typeof document === 'undefined' || !document.hidden) tick();
+    }, ms);
+  };
+  const onVis = () => {
+    if (!document.hidden) tick();
+  };
+  start();
+  document.addEventListener('visibilitychange', onVis);
+  return () => {
+    if (iv) clearInterval(iv);
+    document.removeEventListener('visibilitychange', onVis);
+  };
+}
+
 export function useDataMode(): DataMode {
   const [m, setM] = useState<DataMode>(getDataMode());
   useEffect(() => onDataMode(setM), []);
@@ -19,11 +42,10 @@ export function useQuote(sec: Security | null): Quote | null {
     }
     let dead = false;
     const tick = () => getQuote(sec).then((v) => !dead && setQ(v)).catch(() => {});
-    tick();
-    const iv = setInterval(tick, mode === 'live' ? 12_000 : 2_500);
+    const stop = pollWhileVisible(tick, mode === 'live' ? 12_000 : 2_500);
     return () => {
       dead = true;
-      clearInterval(iv);
+      stop();
     };
   }, [sec?.id, mode]);
   return q;
@@ -44,11 +66,10 @@ export function useQuotes(secs: Security[]): Map<string, Quote> {
           setMap(new Map(qs.map((q) => [q.secId, q])));
         })
         .catch(() => {});
-    tick();
-    const iv = setInterval(tick, mode === 'live' ? 15_000 : 2_500);
+    const stop = pollWhileVisible(tick, mode === 'live' ? 15_000 : 2_500);
     return () => {
       dead = true;
-      clearInterval(iv);
+      stop();
     };
   }, [key, mode]);
   return map;

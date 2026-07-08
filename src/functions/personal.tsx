@@ -4,13 +4,14 @@ import { QuoteRow, ScreenTitle } from '../components/widgets';
 import { useQuotes } from '../data/hooks';
 import { resolveSecurity } from '../core/parser';
 import { getSecurity } from '../data/universe';
+import { storageGet, storageSet } from '../core/storage';
 
 const WATCH_KEY = 'theterminal.watchlist';
 const NOTE_KEY = 'theterminal.notes';
 
 function loadWatch(): string[] {
   try {
-    const raw = localStorage.getItem(WATCH_KEY);
+    const raw = storageGet(WATCH_KEY);
     if (raw) return JSON.parse(raw);
   } catch { /* ignore */ }
   return ['AAPL US Equity', 'NVDA US Equity', 'SPX Index', 'EURUSD Curncy', 'GC1 Comdty', 'XBT Crypto'];
@@ -23,7 +24,7 @@ export function WatchFn({ panel }: FnProps) {
   const [err, setErr] = useState('');
 
   useEffect(() => {
-    localStorage.setItem(WATCH_KEY, JSON.stringify(ids));
+    storageSet(WATCH_KEY, JSON.stringify(ids));
   }, [ids]);
 
   const secs = useMemo(
@@ -97,9 +98,9 @@ export function WatchFn({ panel }: FnProps) {
 
 /** NOTE — personal scratchpad (persisted locally). */
 export function NoteFn(_: FnProps) {
-  const [text, setText] = useState(() => localStorage.getItem(NOTE_KEY) ?? '');
+  const [text, setText] = useState(() => storageGet(NOTE_KEY) ?? '');
   useEffect(() => {
-    const t = setTimeout(() => localStorage.setItem(NOTE_KEY, text), 300);
+    const t = setTimeout(() => storageSet(NOTE_KEY, text), 300);
     return () => clearTimeout(t);
   }, [text]);
   return (
