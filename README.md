@@ -6,11 +6,21 @@ charts, news, and an MCP server so agents can use it too.
 
 ![status](https://img.shields.io/badge/phase-7-d4b476) ![functions](https://img.shields.io/badge/functions-43_live_·_94_registered-0a0d13)
 
+## Try it
+
+- **Hosted demo (simulated market):** https://tejasjhamb67-dev.github.io/theterminal/ — auto-deployed
+  from this branch by GitHub Actions.
+- **Vercel (LIVE data):** import this repo at [vercel.com/new](https://vercel.com/new) or run
+  `npx vercel` — `vercel.json` + `api/yf.js` proxy the Yahoo Finance connector server-side, so a
+  Vercel deployment runs in **● LIVE DATA** mode.
+- Static hosts (Pages, artifacts) have no `/yf` proxy, so they run on the built-in simulated
+  market — same UI, deterministic streaming ticks.
+
 ## Quick start
 
 ```bash
 npm install
-npm run dev        # → http://localhost:5173
+npm run dev        # → http://localhost:5173 (LIVE via dev proxy)
 ```
 
 With internet access the top bar shows **● LIVE DATA** (Yahoo Finance
